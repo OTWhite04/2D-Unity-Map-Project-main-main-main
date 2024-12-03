@@ -5,6 +5,7 @@ using UnityEngine.Tilemaps;
 using UnityEngine.WSA;
 public class PlayerControls : MonoBehaviour
 {
+    public int health;
     //Public Tilemap variable for declaring the tilemap.
     public Tilemap tilemap;
     //Vector3Int foe the currenttile.

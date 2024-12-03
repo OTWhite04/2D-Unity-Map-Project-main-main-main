@@ -6,14 +6,14 @@ using TMPro;
 
 public class EnemyScript : MonoBehaviour
 {
-    
-    //Tilemap variable for enemy,
+    public PlayerControls playerControls;
+    //Tilemap variable for enemy.
     public Tilemap tilemap;
     //Game objects for the enemy tile and the win text after defeating the enemy.
     public GameObject Enemy;
     public GameObject WinTextObject;
     //TextMeshProUGUI for displaying Enemy health and health statuses.
-    public TextMeshProUGUI textmeshpro;
+    public TextMeshProUGUI healthText;
     //Variable for setting enemy health to 100.
     public int Health = 100;
     //Public string for the health status of the enemy depending on how much health it has.
@@ -22,33 +22,32 @@ public class EnemyScript : MonoBehaviour
     public Transform PlayerTile;
     //Damage amount Enemy can do to the player.
     private int damage = 20;
+    
+    bool inCombat = false;
+    bool turnIsOver = false;
 
+
+    public Vector3Int enemyPos;
+    bool moving;
 
     //Public bool for checking if the Enemy has moved.
-    public bool HasMoved = true;
+    public bool HasMoved = false;
     
     // Start is called before the first frame update
     void Start()
     {
-        textmeshpro = GetComponent<TextMeshProUGUI>();
+        Debug.Log(PlayerTile);
 
-        if (textmeshpro != null)
-        {
-            textmeshpro.text = ShowHUD();
-        }
-        else
-        {
-            Debug.LogError("Component not found");
-        }
+        healthText.SetText(playerControls.health.ToString());
 
     }
 
     public string ShowHUD()
     {
-        string healthStatus = HealthStatus(health);
-        if (textmeshpro != null)
+        string healthStatus = HealthStatus(playerControls.health);
+        if (healthText != null)
         {
-            textmeshpro.text = $"Health: {Health} " + $"Health Status: {healthStatus}";
+            healthText.SetText = $"Health: {playerControls.health} " + $"Health Status: {healthStatus}";
         }
         else
         {
@@ -56,7 +55,7 @@ public class EnemyScript : MonoBehaviour
         }
 
 
-        return $"Health: {Health} " + $"Health Status: {healthStatus}";
+        return $"Health: {playerControls.health} " + $"Health Status: {healthStatus}";
 
     }
 
@@ -84,9 +83,41 @@ public class EnemyScript : MonoBehaviour
         }
 
         //Changes health to health minus damage taken.
-        health -= damage;
+        Health -= damage;
 
 
+    }
+
+    void HandleTurns()
+    {
+        bool playerTurn = false;
+
+        if(!turnIsOver)
+        {
+            if(!playerTurn)
+            {
+                playerControls.health -= damage;
+                Debug.Log("Enemy Attacks you! Player Health: " + playerControls.health);
+
+                TakeDamage();
+
+                playerTurn = true;
+            }
+            else 
+            { 
+                if(Input.anyKeyDown)
+                {
+                    Debug.Log("You Attack!");
+
+                    playerTurn = false;
+                }
+            
+            }
+        }
+        else 
+        {
+            turnIsOver = false;
+        }
     }
 
     //Method for the health status that lets the player know how badly they are injured depending on the range of their health.
@@ -123,45 +154,38 @@ public class EnemyScript : MonoBehaviour
     void Update()
     {
         //If statement checking if the enemy has moved on the map.
-        if (HasMoved)
+        if (!inCombat && !turnIsOver)
         {
-            return;
+            StartCoroutine(FollowPlayer());
         }
-        else
+        else if(inCombat && !turnIsOver)
         {
-           
-            FollowPlayer();
+
+            HandleTurns();            
         }
-        
 
 
+        ShowHUD();
     }
 
     //Method for the Enemy to follow the player with.
-    public void FollowPlayer()
+    public IEnumerator FollowPlayer()
     {
-        if(HasMoved)
-        {
-            return;
-        }
-        else
-        {
-            //Gives the direction of the player with normalizing the transform position of the player.
-            Vector3Int CellPosition = tilemap.WorldToCell(transform.position);
-            //
-            Vector3Int PlayerPosition = tilemap.WorldToCell(PlayerTile.position);
-            //
-            Vector3Int DirectionToPlayer = PlayerPosition - CellPosition;
-            //
-            Vector3Int NewPosition = CellPosition + new Vector3Int(-1, 0, 0);
-            //
+        if (moving) yield break;
 
-            transform.position = tilemap.CellToWorld(NewPosition);
+        moving = true;
+
+
+        Debug.Log($"New Position: {CheckDirectionToMove()}");
         
-            HasMoved = true;
-            return;
+        yield return new WaitForSeconds(.6f);
+
+        if (IsTileWalkable(CheckDirectionToMove()))
+        {
+            transform.position = CheckDirectionToMove();
         }
         
+        moving = false;
     }
 
     ////Method for Enemy to attack the player.
@@ -169,13 +193,58 @@ public class EnemyScript : MonoBehaviour
     //{
 
     //}
+
+
+    Vector3Int CheckDirectionToMove()
+    {
+        Vector3Int direction = new();
+
+        Vector3Int CellPosition = tilemap.WorldToCell(transform.position);
+
+        Vector3Int PlayerPosition = tilemap.WorldToCell(PlayerTile.position);
+
+        Vector3Int DifferenceFromEnemyToPlayer = (PlayerPosition - CellPosition);
+
+        if(DifferenceFromEnemyToPlayer.x > 0)
+        {
+            if(Mathf.Abs(DifferenceFromEnemyToPlayer.y) <= DifferenceFromEnemyToPlayer.x)
+            {
+                direction = Vector3Int.left;
+            }
+        }
+        else if(DifferenceFromEnemyToPlayer.x < 0)
+        {
+            if(Mathf.Abs(DifferenceFromEnemyToPlayer.y) <= Mathf.Abs(DifferenceFromEnemyToPlayer.x))
+            {
+                direction = Vector3Int.right;
+            }
+        }
+        if(DifferenceFromEnemyToPlayer.y > 0)
+        {
+            if(Mathf.Abs(DifferenceFromEnemyToPlayer.x) <= DifferenceFromEnemyToPlayer.y)
+            {
+                direction = Vector3Int.down;
+            }
+        }
+        else if(DifferenceFromEnemyToPlayer.y < 0)
+        {
+            if(Mathf.Abs(DifferenceFromEnemyToPlayer.x) <= Mathf.Abs(DifferenceFromEnemyToPlayer.y))
+            {
+                direction = Vector3Int.up;
+            }
+        }
+
+        Vector3Int NewPosition = CellPosition - direction;
+        return NewPosition;
+
+    }
     
     //bool for checking if certain tiles are walkable for the Enemy.
     bool IsTileWalkable(Vector3Int tilePosition)
     {
         TileBase tile = tilemap.GetTile(tilePosition);
 
-
+        Vector3Int newPlayerPosition = tilemap.WorldToCell(new Vector3(PlayerTile.position.x, PlayerTile.position.y, PlayerTile.position.z));
         if (tile != null)
         {
             //Combat Check
@@ -185,10 +254,16 @@ public class EnemyScript : MonoBehaviour
             //    return false;
             //}
 
-            //A string for making tileName equal the name of the tiles.
-            string tileName = tile.name;
-            //If statement for tiles that I don't want the player to walk on.
-            if (tileName == "Wall Tile" || tileName == "Chest Tile" || tileName == "DoorTile" || tileName == "PlayerTile")
+            if (tilePosition == newPlayerPosition)
+            {
+                Debug.Log($"Collided with the Player");
+
+                inCombat = true;
+
+                return false;
+            } 
+            
+            else if (tile.name == "Wall Tile" || tile.name == "Chest Tile" || tile.name == "DoorTile" || tile.name == "PlayerTile")
             {
                 return false;
             }
@@ -198,19 +273,6 @@ public class EnemyScript : MonoBehaviour
             }
 
         }
-        else
-        {
-            return false;
-        }
-
-
-
+        return false;
     }
-
-
-
-
-
-
-
 }
