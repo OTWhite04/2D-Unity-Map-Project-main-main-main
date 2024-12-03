@@ -2084,7 +2084,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Player: {fileID: 1411938291}
   LosetextObject: {fileID: 793070854}
-  textmeshpro: {fileID: 0}
+  textmeshpro: {fileID: 384292224}
   health: 100
   lives: 3
   healthStatus: 
@@ -2566,7 +2566,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Get back in there and fight!\n        (or don't I guess)"
+  m_text: "Get back in there and fight!\n      (or don't I guess idk)"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
