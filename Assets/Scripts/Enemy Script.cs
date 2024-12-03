@@ -22,13 +22,13 @@ public class EnemyScript : MonoBehaviour
     public Transform PlayerTile;
     //Damage amount Enemy can do to the player.
     private int damage = 20;
-    
+    //Bools for the enemy being in combat and telling if the turn is over and moving.
     bool inCombat = false;
     bool turnIsOver = false;
-
+    bool moving;
 
     public Vector3Int enemyPos;
-    bool moving;
+   
 
     //Public bool for checking if the Enemy has moved.
     public bool HasMoved = false;
@@ -47,7 +47,7 @@ public class EnemyScript : MonoBehaviour
         string healthStatus = HealthStatus(playerControls.health);
         if (healthText != null)
         {
-            healthText.SetText = $"Health: {playerControls.health} " + $"Health Status: {healthStatus}";
+            healthText.SetText($"Health: {playerControls.health} " + $"Health Status: {healthStatus}");
         }
         else
         {
