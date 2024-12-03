@@ -59,22 +59,22 @@ public class PlayerControls : MonoBehaviour
     {
         
         //Keycodes for the four different WASD directions.
-        if(Input.GetKeyDown(KeyCode.W))
+        if(Input.GetKeyDown(KeyCode.W) && !HasMoved)
         {
             newTile = currentTile + new Vector3Int(0, 1, 0);
             HasMoved = true;
         }
-        else if(Input.GetKeyDown(KeyCode.S))
+        else if(Input.GetKeyDown(KeyCode.S) && !HasMoved)
         {
             newTile = currentTile + new Vector3Int(0, -1, 0);
             HasMoved = true;
         }
-        else if(Input.GetKeyDown(KeyCode.D))
+        else if(Input.GetKeyDown(KeyCode.D) && !HasMoved)
         {
             newTile = currentTile + new Vector3Int(1, 0, 0);
             HasMoved = true;
         }
-        else if(Input.GetKeyDown(KeyCode.A))
+        else if(Input.GetKeyDown(KeyCode.A) && !HasMoved)
         {
             newTile = currentTile + new Vector3Int(-1, 0, 0);
             HasMoved = true;
@@ -85,7 +85,7 @@ public class PlayerControls : MonoBehaviour
         }
 
         target = tilemap.CellToWorld(newTile);
-
+        HasMoved = false;
         
     }
 
