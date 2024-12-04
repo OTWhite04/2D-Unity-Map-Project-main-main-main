@@ -91,6 +91,7 @@ public class EnemyScript : MonoBehaviour
     void HandleTurns()
     {
         bool playerTurn = false;
+        
 
         if(!turnIsOver)
         {
@@ -100,7 +101,7 @@ public class EnemyScript : MonoBehaviour
                 Debug.Log("Enemy Attacks you! Player Health: " + playerControls.health);
 
                 TakeDamage();
-
+                turnIsOver = true;
                 playerTurn = true;
             }
             else 
@@ -110,7 +111,10 @@ public class EnemyScript : MonoBehaviour
                     Debug.Log("You Attack!");
 
                     playerTurn = false;
+                    turnIsOver = false;
                 }
+
+                
             
             }
         }
@@ -118,6 +122,9 @@ public class EnemyScript : MonoBehaviour
         {
             turnIsOver = false;
         }
+
+        
+    
     }
 
     //Method for the health status that lets the player know how badly they are injured depending on the range of their health.
@@ -157,15 +164,18 @@ public class EnemyScript : MonoBehaviour
         if (!inCombat && !turnIsOver)
         {
             StartCoroutine(FollowPlayer());
+            turnIsOver = false;
         }
         else if(inCombat && !turnIsOver)
         {
 
-            HandleTurns();            
+            HandleTurns();
+            turnIsOver = false;
         }
 
-
+        turnIsOver = true;
         ShowHUD();
+        
     }
 
     //Method for the Enemy to follow the player with.
@@ -183,7 +193,9 @@ public class EnemyScript : MonoBehaviour
         if (IsTileWalkable(CheckDirectionToMove()))
         {
             transform.position = CheckDirectionToMove();
+            
         }
+
         
         moving = false;
     }
@@ -210,6 +222,7 @@ public class EnemyScript : MonoBehaviour
             if(Mathf.Abs(DifferenceFromEnemyToPlayer.y) <= DifferenceFromEnemyToPlayer.x)
             {
                 direction = Vector3Int.left;
+                turnIsOver = true;
             }
         }
         else if(DifferenceFromEnemyToPlayer.x < 0)
@@ -235,8 +248,9 @@ public class EnemyScript : MonoBehaviour
         }
 
         Vector3Int NewPosition = CellPosition - direction;
+        
         return NewPosition;
-
+        
     }
     
     //bool for checking if certain tiles are walkable for the Enemy.
