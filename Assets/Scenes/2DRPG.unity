@@ -2109,6 +2109,7 @@ MonoBehaviour:
   tilemap: {fileID: 1525836386}
   currentTile: {x: 1, y: 1, z: 0}
   moveSpeed: 1
+  attack: 20
   PlayerTile: {fileID: 1411938291}
   IsplayersTurn: 1
   HasMoved: 0

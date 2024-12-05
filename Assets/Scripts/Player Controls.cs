@@ -12,6 +12,7 @@ public class PlayerControls : MonoBehaviour
     public Vector3Int currentTile;
     //Float Move speed of the player.
     public float moveSpeed = 1.0f;
+    public int attack = 20;
     //Public game tile for the player.
     public GameObject PlayerTile;
     //Public bools used for checking if the player of enemy has moved.
@@ -24,16 +25,18 @@ public class PlayerControls : MonoBehaviour
     private Vector3 target;
 
     
-
+    //Start method of the controls script.
     void Start()
     {
+        //Finds the enemy with a tag and gets the enemy script component.
         enemyscript = GameObject.FindWithTag("Enemy").GetComponent<EnemyScript>();
         currentTile = tilemap.WorldToCell(transform.position);
+       //makes transform.position equal the target position.
         target = transform.position;
 
     }
 
-    
+    //Update method.
     void Update()
     {
         //Calling the input method.
@@ -92,11 +95,12 @@ public class PlayerControls : MonoBehaviour
     //Method for moving the player if tile is walkable.
     void MovePlayer()
     {
-        //If statement that allows the player
+        //If statement checking if the tile is walkable and is the player's turn.
         if (IsTileWalkable(newTile) && IsplayersTurn)
         {
+            //Transforming position being equal to the new tile.
             transform.position = newTile;
-
+            //Making current tile equal the new tile.
             currentTile = newTile; 
         
         }
@@ -106,35 +110,38 @@ public class PlayerControls : MonoBehaviour
     //Method for enemy starting their turn.
     void StartEnemyTurn()
     {
+        //Sets the player turn to false so they can't move.
         IsplayersTurn = false;
-
+        //sets HasMoved in enemy script to false.
         enemyscript.HasMoved = false;
     }
 
     //Method for calling the attack from the player.
     void PlayerAttack(Vector3Int tilePosition)
     {
-        
+        enemyscript.Health -= attack; 
     }
 
     //Bool that returns if a tile can be walked on or not with a true or false.
     bool IsTileWalkable(Vector3Int tilePosition)
     {
+        
         TileBase tile = tilemap.GetTile(tilePosition);
 
         
         if(tile != null)
         {
             //Combat check for player to attack an enemy.
-            
-            //tile. before tilePosition.
+
+            ////If statement for the tile position being equal to the enemy position.
             //if (tilePosition == enemyPosition)
             //{
+            //    //Calls player attack method for tile position.
             //    PlayerAttack(tilePosition);
             //    return false;
             //}
 
-            //
+            //turning tile.name into a string called tileName.
             string tileName = tile.name;
            //If statement for tiles that I don't want the player to walk on.
             if(tileName == "Wall Tile" || tileName == "Chest Tile" || tileName == "DoorTile" || tileName == "Enemy Tile")

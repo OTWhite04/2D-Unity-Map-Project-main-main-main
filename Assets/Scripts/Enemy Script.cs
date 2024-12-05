@@ -6,7 +6,7 @@ using TMPro;
 
 public class EnemyScript : MonoBehaviour
 {
-
+    //Variable for the player controls script.
     public PlayerControls playerControls;
     //Tilemap variable for enemy.
     public Tilemap tilemap;
@@ -26,6 +26,7 @@ public class EnemyScript : MonoBehaviour
     //Bools for the enemy being in combat and telling if the turn is over and moving.
     bool inCombat = false;
     bool turnIsOver = false;
+    //Bool for moving.
     bool moving;
     //Vector3Int for the enemy position.
     public Vector3Int enemyPos;
@@ -42,16 +43,40 @@ public class EnemyScript : MonoBehaviour
         healthText.SetText(playerControls.health.ToString());
 
     }
-    //Public string that shows the enemy's health and health status.
+
+
+    // Update is called once per frame
+    void Update()
+    {
+        //If statement checking if the enemy has moved on the map.
+        if (!inCombat && !turnIsOver)
+        {
+            StartCoroutine(FollowPlayer());
+        }
+        else if (inCombat && !turnIsOver)
+        {
+
+            HandleTurns();
+        }
+
+        //Updates hud for damage done to enemy.
+        ShowHUD();
+    }
+
+    //Public string for displaying the enemy's health and health status.
     public string ShowHUD()
     {
+        //Calls the health status method.
         string healthStatus = HealthStatus(playerControls.health);
+        //If statement for checking if health text isn't null.
         if (healthText != null)
         {
+            //Sets the health and health text to the text mesh pro in the scene.
             healthText.SetText($"Health: {playerControls.health} " + $"Health Status: {healthStatus}");
         }
         else
         {
+            //Displays error for the health text component not being found.
             Debug.LogError("Component not found");
         }
 
@@ -79,6 +104,7 @@ public class EnemyScript : MonoBehaviour
         //If statement for player health reaching zero.
         if (Health == 0)
         {
+            //Sets enemy to inactive and displays the text for winning.
             Enemy.SetActive(false);
             WinTextObject.SetActive(true);
         }
@@ -89,9 +115,12 @@ public class EnemyScript : MonoBehaviour
 
     }
 
+    //Method for handling the turns taken.
     void HandleTurns()
     {
+        //Sets player turn to false.
         bool playerTurn = false;
+
 
         if(!turnIsOver)
         {
@@ -99,17 +128,19 @@ public class EnemyScript : MonoBehaviour
             {
                 playerControls.health -= damage;
                 Debug.Log("Enemy Attacks you! Player Health: " + playerControls.health);
-
+                //Calls the take damage method.
                 TakeDamage();
-
+                //Sets player turn to true sp the player can move.
                 playerTurn = true;
             }
             else 
             { 
+
                 if(Input.anyKeyDown)
                 {
+                    
                     Debug.Log("You Attack!");
-
+                    //Makes it so the player can't move.
                     playerTurn = false;
                 }
             
@@ -117,6 +148,7 @@ public class EnemyScript : MonoBehaviour
         }
         else 
         {
+
             turnIsOver = false;
         }
     }
@@ -151,29 +183,12 @@ public class EnemyScript : MonoBehaviour
 
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        //If statement checking if the enemy has moved on the map.
-        if (!inCombat && !turnIsOver)
-        {
-            StartCoroutine(FollowPlayer());
-        }
-        else if(inCombat && !turnIsOver)
-        {
-
-            HandleTurns();            
-        }
-
-
-        ShowHUD();
-    }
 
     //Method for the Enemy to follow the player with.
     public IEnumerator FollowPlayer()
     {
-        if (moving || HasMoved) yield break;
-
+        if (moving) yield break;
+        //Sets moving to true.
         moving = true;
 
 
@@ -184,20 +199,19 @@ public class EnemyScript : MonoBehaviour
         if (IsTileWalkable(CheckDirectionToMove()))
         {
             transform.position = CheckDirectionToMove();
+            Debug.Log(moving);
         }
-
-        HasMoved = true;
-
+        
         moving = false;
     }
 
-    ////Method for Enemy to attack the player.
-    //void EnemyAttack(Vector3Int tilePosition)
-    //{
+    //Method for Enemy to attack the player.
+    void EnemyAttack(Vector3Int tilePosition)
+    {
 
-    //}
+    }
 
-
+    //Vector3Int method for checking the direction for the enemy to move.
     Vector3Int CheckDirectionToMove()
     {
         Vector3Int direction = new();
@@ -208,6 +222,7 @@ public class EnemyScript : MonoBehaviour
 
         Vector3Int DifferenceFromEnemyToPlayer = (PlayerPosition - CellPosition);
 
+        //If and else if statements for moving the enemy in the direction of the player depending on where they are on the tilemap.
         if(DifferenceFromEnemyToPlayer.x > 0)
         {
             if(Mathf.Abs(DifferenceFromEnemyToPlayer.y) <= DifferenceFromEnemyToPlayer.x)
@@ -236,8 +251,9 @@ public class EnemyScript : MonoBehaviour
                 direction = Vector3Int.up;
             }
         }
-
+        //Getting the new position by minusing the cell position and direction.
         Vector3Int NewPosition = CellPosition - direction;
+        //Returning the new position of the enemy.
         return NewPosition;
 
     }
@@ -245,9 +261,11 @@ public class EnemyScript : MonoBehaviour
     //bool for checking if certain tiles are walkable for the Enemy.
     bool IsTileWalkable(Vector3Int tilePosition)
     {
+
         TileBase tile = tilemap.GetTile(tilePosition);
 
         Vector3Int newPlayerPosition = tilemap.WorldToCell(new Vector3(PlayerTile.position.x, PlayerTile.position.y, PlayerTile.position.z));
+        
         if (tile != null)
         {
             //Combat Check
@@ -256,7 +274,7 @@ public class EnemyScript : MonoBehaviour
             //    EnemyAttack(tilePosition);
             //    return false;
             //}
-
+            //If statement for seeing if the tile position is the player position.
             if (tilePosition == newPlayerPosition)
             {
                 Debug.Log($"Collided with the Player");
@@ -265,7 +283,7 @@ public class EnemyScript : MonoBehaviour
 
                 return false;
             } 
-            
+            //Checking tile names so the enemy doesn't go through doors, chests or walls.
             else if (tile.name == "Wall Tile" || tile.name == "Chest Tile" || tile.name == "DoorTile" || tile.name == "PlayerTile")
             {
                 return false;

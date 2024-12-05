@@ -5,6 +5,7 @@ using TMPro;
 
 public class Health : MonoBehaviour
 {
+    //Gameobjects for the player and losing text.
     public GameObject Player;
     public GameObject LosetextObject;
     //Public textmeshpro for displaying the health, health status and lives.
@@ -18,18 +19,20 @@ public class Health : MonoBehaviour
     public string healthStatus;
 
 
-
+    //Health start method.
     public void Start()
     {
         
         textmeshpro = GetComponent<TextMeshProUGUI>();
-
+        //If statement checking if the textmeshpro isn't null.
         if(textmeshpro != null)
         {
+            //Making the showHUD method equal the text mesh pro text.
             textmeshpro.text = ShowHUD();
         }
         else
         {
+            //Writes to the console if the component isn't found.
             Debug.LogError("Component not found");
         }
 
@@ -39,13 +42,17 @@ public class Health : MonoBehaviour
     //Method that prints the health, health status and number of lives the player has into the game.
     public string ShowHUD()
     {
+        //shows the string for the player's health
         string healthStatus = HealthStatus(health);
+        
         if(textmeshpro != null)
         {
+            //Prints health and health status to the textmeshpro.
             textmeshpro.text = $"Health: {health} " + $"Lives: {lives} " + $"Health Status: {healthStatus}";
         }
         else 
         {
+            //Writes this to the console if the component isn't found.
             Debug.LogError("Component not found");
         }
         
@@ -57,13 +64,14 @@ public class Health : MonoBehaviour
     //Method for player taking damage.
     public void TakeDamage()
     {
-        
+        //If statement for player's health being less than zero.
         if(damage < 0)
         {
+            //Writes a warning to the console that the player's health can't be negative.
             Debug.LogWarning("Damage can't be negative");
             return;
         }
-
+        //If statement for the player's health being less than or equal to zero.
         if (health <= 0)
         {
             Debug.LogWarning("Player is dead, no more damage can be taken");
@@ -120,9 +128,10 @@ public class Health : MonoBehaviour
         lives = lives - 1;
         health = 100;
 
-        
+        //If statement for lives equaling zero, sets player to inactive and the loseing text active.
         if(lives == 0)
         {
+            //Sets the player to false and losing text to true.
             Player.SetActive(false);
             LosetextObject.SetActive(true);
         }
