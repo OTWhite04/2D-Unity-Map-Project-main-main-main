@@ -2105,6 +2105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 632ce510342850a4e85e9f8d2e8a4ba6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  health: 100
   tilemap: {fileID: 1525836386}
   currentTile: {x: 1, y: 1, z: 0}
   moveSpeed: 1
@@ -2112,8 +2113,6 @@ MonoBehaviour:
   IsplayersTurn: 1
   HasMoved: 0
   enemyscript: {fileID: 896126559}
-  enemyPosition: {x: 0, y: 0, z: 0}
-  health: 100
 --- !u!1 &1525836383
 GameObject:
   m_ObjectHideFlags: 0

@@ -6,6 +6,7 @@ using TMPro;
 
 public class EnemyScript : MonoBehaviour
 {
+
     public PlayerControls playerControls;
     //Tilemap variable for enemy.
     public Tilemap tilemap;
@@ -26,7 +27,7 @@ public class EnemyScript : MonoBehaviour
     bool inCombat = false;
     bool turnIsOver = false;
     bool moving;
-
+    //Vector3Int for the enemy position.
     public Vector3Int enemyPos;
    
 
@@ -41,7 +42,7 @@ public class EnemyScript : MonoBehaviour
         healthText.SetText(playerControls.health.ToString());
 
     }
-
+    //Public string that shows the enemy's health and health status.
     public string ShowHUD()
     {
         string healthStatus = HealthStatus(playerControls.health);
@@ -91,7 +92,6 @@ public class EnemyScript : MonoBehaviour
     void HandleTurns()
     {
         bool playerTurn = false;
-        
 
         if(!turnIsOver)
         {
@@ -101,7 +101,7 @@ public class EnemyScript : MonoBehaviour
                 Debug.Log("Enemy Attacks you! Player Health: " + playerControls.health);
 
                 TakeDamage();
-                turnIsOver = true;
+
                 playerTurn = true;
             }
             else 
@@ -111,10 +111,7 @@ public class EnemyScript : MonoBehaviour
                     Debug.Log("You Attack!");
 
                     playerTurn = false;
-                    turnIsOver = false;
                 }
-
-                
             
             }
         }
@@ -122,9 +119,6 @@ public class EnemyScript : MonoBehaviour
         {
             turnIsOver = false;
         }
-
-        
-    
     }
 
     //Method for the health status that lets the player know how badly they are injured depending on the range of their health.
@@ -164,24 +158,21 @@ public class EnemyScript : MonoBehaviour
         if (!inCombat && !turnIsOver)
         {
             StartCoroutine(FollowPlayer());
-            turnIsOver = false;
         }
         else if(inCombat && !turnIsOver)
         {
 
-            HandleTurns();
-            turnIsOver = false;
+            HandleTurns();            
         }
 
-        turnIsOver = true;
+
         ShowHUD();
-        
     }
 
     //Method for the Enemy to follow the player with.
     public IEnumerator FollowPlayer()
     {
-        if (moving) yield break;
+        if (moving || HasMoved) yield break;
 
         moving = true;
 
@@ -193,10 +184,10 @@ public class EnemyScript : MonoBehaviour
         if (IsTileWalkable(CheckDirectionToMove()))
         {
             transform.position = CheckDirectionToMove();
-            
         }
 
-        
+        HasMoved = true;
+
         moving = false;
     }
 
@@ -222,7 +213,6 @@ public class EnemyScript : MonoBehaviour
             if(Mathf.Abs(DifferenceFromEnemyToPlayer.y) <= DifferenceFromEnemyToPlayer.x)
             {
                 direction = Vector3Int.left;
-                turnIsOver = true;
             }
         }
         else if(DifferenceFromEnemyToPlayer.x < 0)
@@ -248,9 +238,8 @@ public class EnemyScript : MonoBehaviour
         }
 
         Vector3Int NewPosition = CellPosition - direction;
-        
         return NewPosition;
-        
+
     }
     
     //bool for checking if certain tiles are walkable for the Enemy.
