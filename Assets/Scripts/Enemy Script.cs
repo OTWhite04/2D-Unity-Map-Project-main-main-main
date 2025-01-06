@@ -51,11 +51,11 @@ public class EnemyScript : MonoBehaviour
         //If statement checking if the enemy has moved on the map.
         if (!inCombat && !turnIsOver)
         {
+            //Preforms multiple tasks at once for following the player.
             StartCoroutine(FollowPlayer());
         }
         else if (inCombat && !turnIsOver)
         {
-
             HandleTurns();
         }
 
@@ -101,7 +101,7 @@ public class EnemyScript : MonoBehaviour
             return;
         }
 
-        //If statement for player health reaching zero.
+        //If statement for player health reaching and equaling zero.
         if (Health == 0)
         {
             //Sets enemy to inactive and displays the text for winning.
@@ -274,6 +274,7 @@ public class EnemyScript : MonoBehaviour
             //    EnemyAttack(tilePosition);
             //    return false;
             //}
+            
             //If statement for seeing if the tile position is the player position.
             if (tilePosition == newPlayerPosition)
             {
